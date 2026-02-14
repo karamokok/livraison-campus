@@ -5,30 +5,31 @@
   <title>Livraison Campus</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- Firebase -->
+  <!-- Firebase v9 -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
 
   <script>
     const firebaseConfig = {
-      apiKey: "TON_API_KEY",
-      authDomain: "TON_PROJET.firebaseapp.com",
-      projectId: "TON_PROJET",
-      storageBucket: "TON_PROJET.appspot.com",
-      messagingSenderId: "TON_ID",
-      appId: "TON_APP_ID"
+      apiKey: "AIzaSyCFrEoAxiQlbdV6lqRAluo2PDJQSyGkqGo",
+      authDomain: "livraison-campus.firebaseapp.com",
+      projectId: "livraison-campus",
+      storageBucket: "livraison-campus.appspot.com",
+      messagingSenderId: "1064032229103",
+      appId: "1:1064032229103:web:c0f2b4cace086e89576d1a"
     };
+
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
   </script>
 </head>
 <body>
+
   <script>
-    const user = localStorage.getItem("userConnecte"); // pour compatibilité locale si nécessaire
-    auth.onAuthStateChanged(u => {
-      if (!u) window.location.href = "login.html";
+    auth.onAuthStateChanged(user => {
+      if (!user) window.location.href = "login.html";
     });
   </script>
 
@@ -40,7 +41,6 @@
 
     <hr>
 
-    <!-- Personnes dehors -->
     <input id="nomPersonne" placeholder="Nom (optionnel)">
     <button onclick="seMettreDisponible()">Je suis dehors</button>
 
@@ -49,7 +49,6 @@
 
     <hr>
 
-    <!-- Commandes -->
     <input id="repas" placeholder="Que veux-tu manger ?">
     <button onclick="envoyerCommande()">Envoyer la commande</button>
 
