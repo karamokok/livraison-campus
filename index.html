@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Livraison Campus</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "TON_API_KEY",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "TON_ID",
+      appId: "TON_APP_ID"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <script>
+    const user = localStorage.getItem("userConnecte"); // pour compatibilité locale si nécessaire
+    auth.onAuthStateChanged(u => {
+      if (!u) window.location.href = "login.html";
+    });
+  </script>
+
+  <div class="card">
+    <h1>Livraison Campus</h1>
+
+    <p id="bonjour"></p>
+    <button onclick="logout()">Se déconnecter</button>
+
+    <hr>
+
+    <!-- Personnes dehors -->
+    <input id="nomPersonne" placeholder="Nom (optionnel)">
+    <button onclick="seMettreDisponible()">Je suis dehors</button>
+
+    <h3>Personnes disponibles :</h3>
+    <ul id="personnes"></ul>
+
+    <hr>
+
+    <!-- Commandes -->
+    <input id="repas" placeholder="Que veux-tu manger ?">
+    <button onclick="envoyerCommande()">Envoyer la commande</button>
+
+    <h3>Commandes en cours :</h3>
+    <ul id="commandes"></ul>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
