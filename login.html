@@ -26,15 +26,14 @@
   </script>
 </head>
 <body>
-
   <div class="card">
     <h2>Connexion / Inscription</h2>
 
-    <input id="nom" placeholder="Ton nom">
+    <input id="nom" placeholder="Ton nom (sera utilisé comme email)">
     <input id="password" type="password" placeholder="Mot de passe">
 
-    <button onclick="inscrire()">S'inscrire</button>
-    <button onclick="connecter()">Se connecter</button>
+    <button type="button" onclick="inscrire()">S'inscrire</button>
+    <button type="button" onclick="connecter()">Se connecter</button>
   </div>
 
   <script src="auth.js"></script>

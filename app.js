@@ -1,19 +1,13 @@
-// --- Déconnexion ---
 function logout() {
   auth.signOut()
     .then(() => window.location.href = "login.html")
     .catch(err => alert("Erreur lors de la déconnexion : " + err.message));
 }
 
-// --- Afficher nom connecté ---
 auth.onAuthStateChanged(user => {
-  if (user) {
-    const nomAffiche = user.email.split("@")[0];
-    document.getElementById("bonjour").textContent = "Connecté : " + nomAffiche;
-  }
+  if (user) document.getElementById("bonjour").textContent = "Connecté : " + user.email.split("@")[0];
 });
 
-// --- Ajouter une personne dehors (sans doublon) ---
 function seMettreDisponible() {
   const user = auth.currentUser;
   if (!user) return alert("Tu dois être connecté !");
@@ -22,29 +16,18 @@ function seMettreDisponible() {
   if (!nom) nom = user.email.split("@")[0];
   if (!nom) return alert("Nom invalide !");
 
-  // Vérifier si la personne est déjà dans la collection
-  db.collection("personnes")
-    .where("nom", "==", nom)
-    .get()
+  db.collection("personnes").where("nom", "==", nom).get()
     .then(snapshot => {
-      if (!snapshot.empty) {
-        alert(`${nom} est déjà marqué comme dehors !`);
-        return;
-      }
+      if (!snapshot.empty) return alert(`${nom} est déjà marqué comme dehors !`);
 
-      // Ajouter la personne si pas de doublon
       db.collection("personnes").add({
         nom: nom,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(() => {
-        document.getElementById("nomPersonne").value = "";
-      })
-      .catch(err => alert("Erreur : " + err.message));
+      }).then(() => document.getElementById("nomPersonne").value = "")
+        .catch(err => alert("Erreur : " + err.message));
     });
 }
 
-// --- Liste des personnes en temps réel ---
 const personnesUl = document.getElementById("personnes");
 db.collection("personnes").orderBy("timestamp")
   .onSnapshot(snapshot => {
@@ -56,7 +39,6 @@ db.collection("personnes").orderBy("timestamp")
     });
   });
 
-// --- Envoyer une commande ---
 function envoyerCommande() {
   const user = auth.currentUser;
   const repas = document.getElementById("repas").value.trim();
@@ -68,14 +50,10 @@ function envoyerCommande() {
     client: user.email.split("@")[0],
     repas: repas,
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    document.getElementById("repas").value = "";
-  })
-  .catch(err => alert("Erreur : " + err.message));
+  }).then(() => document.getElementById("repas").value = "")
+    .catch(err => alert("Erreur : " + err.message));
 }
 
-// --- Afficher commandes en temps réel ---
 const commandesUl = document.getElementById("commandes");
 db.collection("commandes").orderBy("timestamp")
   .onSnapshot(snapshot => {
