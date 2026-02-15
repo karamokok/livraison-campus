@@ -1,43 +1,44 @@
 function inscrire() {
-  const nom = document.getElementById("nom").value.trim();
-  const password = document.getElementById("password").value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
-  if (!nom || !password) return alert("Remplis tous les champs !");
-  if (password.length < 6) return alert("Le mot de passe doit contenir au moins 6 caractères !");
-
-  const email = `${nom}@campus.com`;
+  if (!email || !password) {
+    alert("Remplis tous les champs");
+    return;
+  }
 
   auth.createUserWithEmailAndPassword(email, password)
-    .then(() => {
-      alert(`Compte créé pour ${nom} !`);
-      window.location.href = "index.html";
+    .then((userCredential) => {
+      // Créer un profil utilisateur dans Firestore
+      return db.collection("users").doc(userCredential.user.uid).set({
+        email: email,
+        pseudo: email.split('@')[0], // Pseudo par défaut
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
     })
-    .catch(error => {
-      if (error.code === "auth/email-already-in-use") alert("Ce nom est déjà utilisé !");
-      else if (error.code === "auth/invalid-email") alert("Nom invalide !");
-      else alert(error.message);
-    });
+    .then(() => {
+      alert("Compte créé !");
+      window.location.href = "dashboard.html"; // REDIRECTION VERS DASHBOARD
+    })
+    .catch(error => alert(error.message));
 }
 
 function connecter() {
-  const nom = document.getElementById("nom").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!nom || !password) return alert("Remplis tous les champs !");
-
-  const email = `${nom}@campus.com`;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
   auth.signInWithEmailAndPassword(email, password)
-    .then(() => window.location.href = "index.html")
-    .catch(error => {
-      if (error.code === "auth/user-not-found") alert("Ce compte n'existe pas !");
-      else if (error.code === "auth/wrong-password") alert("Mot de passe incorrect !");
-      else alert(error.message);
-    });
+    .then(() => window.location.href = "dashboard.html") // REDIRECTION VERS DASHBOARD
+    .catch(error => alert(error.message));
 }
 
+function logout() {
+  auth.signOut().then(() => window.location.href = "index.html"); // RETOUR À L'ACCUEIL
+}
+
+// Redirection si non connecté
 auth.onAuthStateChanged(user => {
-  if (!user && window.location.pathname.includes("index.html")) {
+  if (!user && window.location.pathname.includes("dashboard.html")) {
     window.location.href = "login.html";
   }
 });

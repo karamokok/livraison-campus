@@ -4,36 +4,59 @@
   <meta charset="UTF-8">
   <title>Connexion - Livraison Campus</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <!-- Firebase v9 -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
 
   <script>
+    // TA configuration Firebase (mets la tienne ici)
     const firebaseConfig = {
       apiKey: "AIzaSyCFrEoAxiQlbdV6lqRAluo2PDJQSyGkqGo",
       authDomain: "livraison-campus.firebaseapp.com",
       projectId: "livraison-campus",
-      storageBucket: "livraison-campus.appspot.com",
+      storageBucket: "livraison-campus.firebasestorage.app",
       messagingSenderId: "1064032229103",
-      appId: "1:1064032229103:web:c0f2b4cace086e89576d1a"
+      appId: "1:1064032229103:web:c0f2b4cace086e89576d1a",
+      measurementId: "G-RQHV8MK4YE"
     };
-
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
   </script>
 </head>
 <body>
-  <div class="card">
-    <h2>Connexion / Inscription</h2>
+  <div class="container">
+    <div class="card login-card">
+      <!-- Lien retour vers l'accueil -->
+      <a href="index.html" style="display: inline-block; margin-bottom: 20px; color: #667eea; text-decoration: none; font-size: 0.9rem;">
+        <i class="fas fa-arrow-left"></i> Retour à l'accueil
+      </a>
+      
+      <h1><i class="fas fa-utensils"></i> Livraison Campus</h1>
+      <p>Connecte-toi pour commander ou aider</p>
 
-    <input id="nom" placeholder="Ton nom (sera utilisé comme email)">
-    <input id="password" type="password" placeholder="Mot de passe">
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" placeholder="Email universitaire" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+      </div>
 
-    <button type="button" onclick="inscrire()">S'inscrire</button>
-    <button type="button" onclick="connecter()">Se connecter</button>
+      <button onclick="connecter()" class="btn-primary" style="width: 100%; margin-bottom: 10px;">
+        <i class="fas fa-sign-in-alt"></i> Se connecter
+      </button>
+      <button onclick="inscrire()" class="btn-secondary" style="width: 100%;">
+        <i class="fas fa-user-plus"></i> S'inscrire
+      </button>
+    </div>
   </div>
 
   <script src="auth.js"></script>
