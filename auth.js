@@ -7,20 +7,25 @@ function inscrire() {
     return;
   }
 
+  console.log("Tentative d'inscription avec:", email);
+  
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
-      // Créer un profil utilisateur dans Firestore
+      console.log("Succès!", userCredential);
       return db.collection("users").doc(userCredential.user.uid).set({
         email: email,
-        pseudo: email.split('@')[0], // Pseudo par défaut
+        pseudo: email.split('@')[0],
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     })
     .then(() => {
       alert("Compte créé !");
-      window.location.href = "dashboard.html"; // REDIRECTION VERS DASHBOARD
+      window.location.href = "dashboard.html";
     })
-    .catch(error => alert(error.message));
+    .catch(error => {
+      console.error("ERREUR:", error);
+      alert("Erreur: " + error.message);
+    });
 }
 
 function connecter() {
@@ -28,12 +33,15 @@ function connecter() {
   const password = document.getElementById('password').value;
 
   auth.signInWithEmailAndPassword(email, password)
-    .then(() => window.location.href = "dashboard.html") // REDIRECTION VERS DASHBOARD
-    .catch(error => alert(error.message));
+    .then(() => window.location.href = "dashboard.html")
+    .catch(error => {
+      console.error("ERREUR:", error);
+      alert("Erreur: " + error.message);
+    });
 }
 
 function logout() {
-  auth.signOut().then(() => window.location.href = "index.html"); // RETOUR À L'ACCUEIL
+  auth.signOut().then(() => window.location.href = "index.html");
 }
 
 // Redirection si non connecté
