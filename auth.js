@@ -3,15 +3,23 @@ function inscrire() {
   const password = document.getElementById('password').value;
 
   if (!email || !password) {
-    alert("Remplis tous les champs");
+    alert("❌ Remplis tous les champs");
     return;
   }
 
-  console.log("Tentative d'inscription avec:", email);
+  if (password.length < 6) {
+    alert("❌ Le mot de passe doit contenir au moins 6 caractères");
+    return;
+  }
+
+  console.log("📝 Tentative d'inscription avec:", email);
   
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
-      console.log("Succès!", userCredential);
+      console.log("✅ Inscription réussie!", userCredential.user.email);
+      alert("✅ Compte créé avec succès ! Redirection en cours...");
+      
+      // Créer le profil utilisateur dans Firestore
       return db.collection("users").doc(userCredential.user.uid).set({
         email: email,
         pseudo: email.split('@')[0],
@@ -19,12 +27,29 @@ function inscrire() {
       });
     })
     .then(() => {
-      alert("Compte créé !");
+      console.log("✅ Profil créé dans Firestore");
+      alert("✅ Redirection vers le tableau de bord...");
       window.location.href = "dashboard.html";
     })
     .catch(error => {
-      console.error("ERREUR:", error);
-      alert("Erreur: " + error.message);
+      console.error("❌ ERREUR COMPLÈTE:", error);
+      
+      // Messages d'erreur compréhensibles
+      let message = "❌ Erreur : ";
+      switch(error.code) {
+        case 'auth/email-already-in-use':
+          message += "Cet email est déjà utilisé";
+          break;
+        case 'auth/invalid-email':
+          message += "Email invalide";
+          break;
+        case 'auth/weak-password':
+          message += "Mot de passe trop faible (minimum 6 caractères)";
+          break;
+        default:
+          message += error.message;
+      }
+      alert(message);
     });
 }
 
@@ -32,21 +57,60 @@ function connecter() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
+  if (!email || !password) {
+    alert("❌ Remplis tous les champs");
+    return;
+  }
+
+  console.log("🔑 Tentative de connexion avec:", email);
+  
   auth.signInWithEmailAndPassword(email, password)
-    .then(() => window.location.href = "dashboard.html")
+    .then((userCredential) => {
+      console.log("✅ Connexion réussie!", userCredential.user.email);
+      alert("✅ Connexion réussie ! Redirection en cours...");
+      window.location.href = "dashboard.html";
+    })
     .catch(error => {
-      console.error("ERREUR:", error);
-      alert("Erreur: " + error.message);
+      console.error("❌ ERREUR:", error);
+      
+      let message = "❌ Erreur : ";
+      switch(error.code) {
+        case 'auth/user-not-found':
+          message += "Utilisateur non trouvé";
+          break;
+        case 'auth/wrong-password':
+          message += "Mot de passe incorrect";
+          break;
+        default:
+          message += error.message;
+      }
+      alert(message);
     });
 }
 
 function logout() {
-  auth.signOut().then(() => window.location.href = "index.html");
+  console.log("👋 Déconnexion...");
+  auth.signOut()
+    .then(() => {
+      console.log("✅ Déconnecté");
+      window.location.href = "index.html";
+    })
+    .catch(error => {
+      console.error("❌ Erreur déconnexion:", error);
+    });
 }
 
-// Redirection si non connecté
+// Vérifier l'état de la connexion
 auth.onAuthStateChanged(user => {
+  if (user) {
+    console.log("👤 Utilisateur connecté:", user.email);
+  } else {
+    console.log("👤 Aucun utilisateur connecté");
+  }
+  
+  // Redirection si nécessaire
   if (!user && window.location.pathname.includes("dashboard.html")) {
+    console.log("🔄 Redirection vers login.html");
     window.location.href = "login.html";
   }
 });
