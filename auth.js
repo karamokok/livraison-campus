@@ -17,7 +17,6 @@ function inscrire() {
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
       console.log("✅ Inscription réussie!", userCredential.user.email);
-      alert("✅ Compte créé avec succès ! Redirection en cours...");
       
       // Créer le profil utilisateur dans Firestore
       return db.collection("users").doc(userCredential.user.uid).set({
@@ -28,13 +27,12 @@ function inscrire() {
     })
     .then(() => {
       console.log("✅ Profil créé dans Firestore");
-      alert("✅ Redirection vers le tableau de bord...");
-      window.location.href = "dashboard.html";
+      alert("✅ Compte créé avec succès !");
+      window.location.href = "role-choice.html";
     })
     .catch(error => {
       console.error("❌ ERREUR COMPLÈTE:", error);
       
-      // Messages d'erreur compréhensibles
       let message = "❌ Erreur : ";
       switch(error.code) {
         case 'auth/email-already-in-use':
@@ -67,8 +65,8 @@ function connecter() {
   auth.signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
       console.log("✅ Connexion réussie!", userCredential.user.email);
-      alert("✅ Connexion réussie ! Redirection en cours...");
-      window.location.href = "dashboard.html";
+      alert("✅ Connexion réussie !");
+      window.location.href = "role-choice.html";
     })
     .catch(error => {
       console.error("❌ ERREUR:", error);
@@ -80,6 +78,9 @@ function connecter() {
           break;
         case 'auth/wrong-password':
           message += "Mot de passe incorrect";
+          break;
+        case 'auth/invalid-email':
+          message += "Email invalide";
           break;
         default:
           message += error.message;
@@ -97,6 +98,7 @@ function logout() {
     })
     .catch(error => {
       console.error("❌ Erreur déconnexion:", error);
+      alert("Erreur lors de la déconnexion");
     });
 }
 
@@ -104,13 +106,14 @@ function logout() {
 auth.onAuthStateChanged(user => {
   if (user) {
     console.log("👤 Utilisateur connecté:", user.email);
+    
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    if (!user && (currentPage === "dashboard-client.html" || currentPage === "dashboard-livreur.html" || currentPage === "role-choice.html")) {
+      console.log("🔄 Redirection vers login.html");
+      window.location.href = "login.html";
+    }
   } else {
     console.log("👤 Aucun utilisateur connecté");
-  }
-  
-  // Redirection si nécessaire
-  if (!user && window.location.pathname.includes("dashboard.html")) {
-    console.log("🔄 Redirection vers login.html");
-    window.location.href = "login.html";
   }
 });

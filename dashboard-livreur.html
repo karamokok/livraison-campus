@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Livreur - Livraison Campus</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Firebase VERSION 8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFrEoAxiQlbdV6lqRAluo2PDJQSyGkqGo",
+      authDomain: "livraison-campus.firebaseapp.com",
+      projectId: "livraison-campus",
+      storageBucket: "livraison-campus.firebasestorage.app",
+      messagingSenderId: "1064032229103",
+      appId: "1:1064032229103:web:c0f2b4cace086e89576d1a"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <script>
+    auth.onAuthStateChanged(user => {
+      if (!user) window.location.href = "login.html";
+    });
+  </script>
+
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-motorcycle"></i> Espace Livreur</h1>
+      <div>
+        <span id="bonjour">Chargement...</span>
+        <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </header>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 25px;">
+      <!-- Statut livreur -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2><i class="fas fa-toggle-on"></i> Ton statut</h2>
+          <label class="switch">
+            <input type="checkbox" id="statutLivreur" onchange="changerStatut()">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <p id="statutTexte" style="margin: 15px 0; color: #666;">⏸️ Tu n'es pas disponible pour l'instant</p>
+        <button onclick="seMettreDisponible()" class="btn-primary full-width">
+          <i class="fas fa-thumbs-up"></i> Je suis dehors et prêt à livrer !
+        </button>
+      </div>
+
+      <!-- Commandes disponibles -->
+      <div class="card">
+        <h2><i class="fas fa-shopping-bag"></i> Commandes disponibles</h2>
+        <div id="filtres" style="display: flex; gap: 10px; margin: 15px 0;">
+          <button onclick="filtrerCommandes('toutes', event)" class="btn-filter active">Toutes</button>
+          <button onclick="filtrerCommandes('proches', event)" class="btn-filter">À proximité</button>
+        </div>
+        <ul id="commandesDisponibles" class="list" style="max-height: 400px;">
+          <!-- Rempli par app-livreur.js -->
+        </ul>
+      </div>
+
+      <!-- Mes livraisons en cours -->
+      <div class="card">
+        <h2><i class="fas fa-truck"></i> Mes livraisons en cours</h2>
+        <ul id="mesLivraisons" class="list" style="max-height: 300px;">
+          <!-- Rempli par app-livreur.js -->
+        </ul>
+      </div>
+
+      <button onclick="window.location.href='role-choice.html'" class="btn-secondary" style="width: 100%;">
+        <i class="fas fa-arrow-left"></i> Changer de rôle
+      </button>
+    </div>
+  </div>
+
+  <style>
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #28a745;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .btn-filter {
+      padding: 5px 15px;
+      border: 1px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-filter.active {
+      background: #667eea;
+      color: white;
+    }
+    .btn-filter:hover {
+      background: #667eea;
+      color: white;
+    }
+  </style>
+
+  <script src="app-livreur.js"></script>
+</body>
+</html>

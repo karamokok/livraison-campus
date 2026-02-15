@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Choix du rôle - Livraison Campus</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Firebase VERSION 8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFrEoAxiQlbdV6lqRAluo2PDJQSyGkqGo",
+      authDomain: "livraison-campus.firebaseapp.com",
+      projectId: "livraison-campus",
+      storageBucket: "livraison-campus.firebasestorage.app",
+      messagingSenderId: "1064032229103",
+      appId: "1:1064032229103:web:c0f2b4cace086e89576d1a",
+      measurementId: "G-RQHV8MK4YE"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <script>
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-map-marker-alt"></i> Livraison Campus</h1>
+      <div>
+        <span id="bonjour">Chargement...</span>
+        <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </header>
+
+    <div class="role-choice">
+      <div class="card" style="text-align: center; max-width: 800px; margin: 50px auto;">
+        <h2 style="margin-bottom: 30px;">👋 Que veux-tu faire aujourd'hui ?</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+          <!-- Option Livreur -->
+          <div class="role-card" onclick="choisirRole('livreur')" style="cursor: pointer; padding: 40px 20px; border-radius: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; transition: transform 0.3s;">
+            <i class="fas fa-motorcycle" style="font-size: 4rem; margin-bottom: 20px;"></i>
+            <h3 style="font-size: 1.8rem; margin-bottom: 10px;">Livreur</h3>
+            <p style="opacity: 0.9;">Je suis dehors et je peux livrer</p>
+            <div style="margin-top: 20px; font-size: 1rem;">
+              ✓ Voir les commandes disponibles<br>
+              ✓ Accepter des livraisons<br>
+              ✓ Gagner des pourboires
+            </div>
+          </div>
+
+          <!-- Option Client -->
+          <div class="role-card" onclick="choisirRole('client')" style="cursor: pointer; padding: 40px 20px; border-radius: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; transition: transform 0.3s;">
+            <i class="fas fa-shopping-bag" style="font-size: 4rem; margin-bottom: 20px;"></i>
+            <h3 style="font-size: 1.8rem; margin-bottom: 10px;">Client</h3>
+            <p style="opacity: 0.9;">Je veux commander à manger</p>
+            <div style="margin-top: 20px; font-size: 1rem;">
+              ✓ Décrire ma commande<br>
+              ✓ Donner ma localisation<br>
+              ✓ Recevoir ma commande
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: 30px; color: #666;">
+          <i class="fas fa-info-circle"></i> 
+          Tu peux changer de rôle à tout moment depuis le menu
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function logout() {
+      auth.signOut().then(() => window.location.href = "index.html");
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const bonjourElement = document.getElementById("bonjour");
+        if (bonjourElement) {
+          bonjourElement.textContent = `👋 Salut, ${user.email.split('@')[0]} !`;
+        }
+      }
+    });
+
+    function choisirRole(role) {
+      if (role === 'livreur') {
+        window.location.href = "dashboard-livreur.html";
+      } else {
+        window.location.href = "dashboard-client.html";
+      }
+    }
+  </script>
+
+  <style>
+    .role-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+  </style>
+</body>
+</html>

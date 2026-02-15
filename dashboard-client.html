@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Commander - Livraison Campus</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Firebase VERSION 8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFrEoAxiQlbdV6lqRAluo2PDJQSyGkqGo",
+      authDomain: "livraison-campus.firebaseapp.com",
+      projectId: "livraison-campus",
+      storageBucket: "livraison-campus.firebasestorage.app",
+      messagingSenderId: "1064032229103",
+      appId: "1:1064032229103:web:c0f2b4cace086e89576d1a"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <script>
+    auth.onAuthStateChanged(user => {
+      if (!user) window.location.href = "login.html";
+    });
+  </script>
+
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-shopping-bag"></i> Passer une commande</h1>
+      <div>
+        <span id="bonjour">Chargement...</span>
+        <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </header>
+
+    <div class="dashboard-single">
+      <!-- Formulaire de commande détaillé -->
+      <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h2 style="margin-bottom: 20px;">📋 Détails de ta commande</h2>
+        
+        <div style="display: grid; gap: 15px;">
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="nomClient" placeholder="Ton nom complet" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="input-group">
+              <i class="fas fa-graduation-cap"></i>
+              <input type="text" id="filiere" placeholder="Filière (ex: Informatique)" required>
+            </div>
+            <div class="input-group">
+              <i class="fas fa-layer-group"></i>
+              <input type="text" id="niveau" placeholder="Niveau (ex: L3)" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+            <div class="input-group">
+              <i class="fas fa-map-marker-alt"></i>
+              <input type="text" id="salle" placeholder="Salle / Bâtiment (ex: Amphi A)" required>
+            </div>
+            <div class="input-group">
+              <i class="fas fa-sort-numeric-up-alt"></i>
+              <input type="number" id="etage" placeholder="Étage" min="0" max="10" required>
+            </div>
+          </div>
+
+          <div style="margin: 10px 0;">
+            <label style="display: block; text-align: left; margin-bottom: 5px; color: #666;">
+              <i class="fas fa-utensils"></i> Que veux-tu manger ?
+            </label>
+            <textarea id="repas" placeholder="Ex: 2 burgers poulet, frites, coca" rows="3" style="width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #e0e0e0; font-family: inherit;"></textarea>
+          </div>
+
+          <div style="margin: 10px 0;">
+            <label style="display: block; text-align: left; margin-bottom: 5px; color: #666;">
+              <i class="fas fa-clock"></i> Heure souhaitée (optionnel)
+            </label>
+            <input type="time" id="heureLivraison" style="width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #e0e0e0;">
+          </div>
+
+          <div style="margin: 10px 0;">
+            <label style="display: block; text-align: left; margin-bottom: 5px; color: #666;">
+              <i class="fas fa-sticky-note"></i> Instructions spéciales
+            </label>
+            <textarea id="instructions" placeholder="Ex: Sans oignons, sonner avant d'entrer..." rows="2" style="width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #e0e0e0; font-family: inherit;"></textarea>
+          </div>
+
+          <button onclick="envoyerCommande()" class="btn-primary" style="width: 100%; padding: 15px; font-size: 1.2rem;">
+            <i class="fas fa-paper-plane"></i> Envoyer ma commande
+          </button>
+
+          <button onclick="window.location.href='role-choice.html'" class="btn-secondary" style="width: 100%;">
+            <i class="fas fa-arrow-left"></i> Changer de rôle
+          </button>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 2px solid #f0f0f0;">
+
+        <h3>📦 Mes commandes en cours</h3>
+        <ul id="mesCommandes" class="list">
+          <!-- Rempli par app-client.js -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="app-client.js"></script>
+</body>
+</html>
