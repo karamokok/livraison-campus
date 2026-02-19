@@ -3,22 +3,22 @@ function inscrire() {
   const password = document.getElementById('password').value;
 
   if (!email || !password) {
-    alert("❌ Remplis tous les champs");
+    alert("❌ ERREUR : Remplis tous les champs");
     return;
   }
 
   if (password.length < 6) {
-    alert("❌ Le mot de passe doit contenir au moins 6 caractères");
+    alert("❌ ERREUR : Le mot de passe doit contenir au moins 6 caractères");
     return;
   }
 
-  console.log("📝 Tentative d'inscription avec:", email);
+  // Désactiver le bouton pour éviter les doubles clics
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inscription en cours...';
   
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
-      console.log("✅ Inscription réussie!", userCredential.user.email);
-      
-      // Créer le profil utilisateur dans Firestore
       return db.collection("users").doc(userCredential.user.uid).set({
         email: email,
         pseudo: email.split('@')[0],
@@ -26,23 +26,26 @@ function inscrire() {
       });
     })
     .then(() => {
-      console.log("✅ Profil créé dans Firestore");
-      alert("✅ Compte créé avec succès !");
+      alert("✅ SUCCÈS ! Votre compte a été créé. Redirection...");
       window.location.href = "role-choice.html";
     })
     .catch(error => {
-      console.error("❌ ERREUR COMPLÈTE:", error);
+      console.error("❌ ERREUR:", error);
       
-      let message = "❌ Erreur : ";
+      // Réactiver le bouton
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-user-plus"></i> S\'inscrire';
+      
+      let message = "❌ ERREUR : ";
       switch(error.code) {
         case 'auth/email-already-in-use':
-          message += "Cet email est déjà utilisé";
+          message += "Cet email est déjà utilisé par un autre compte";
           break;
         case 'auth/invalid-email':
-          message += "Email invalide";
+          message += "Format d'email invalide (ex: nom@domaine.com)";
           break;
         case 'auth/weak-password':
-          message += "Mot de passe trop faible (minimum 6 caractères)";
+          message += "Mot de passe trop faible. Utilise au moins 6 caractères";
           break;
         default:
           message += error.message;
@@ -56,31 +59,37 @@ function connecter() {
   const password = document.getElementById('password').value;
 
   if (!email || !password) {
-    alert("❌ Remplis tous les champs");
+    alert("❌ ERREUR : Remplis tous les champs");
     return;
   }
 
-  console.log("🔑 Tentative de connexion avec:", email);
+  // Désactiver le bouton
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
   
   auth.signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
-      console.log("✅ Connexion réussie!", userCredential.user.email);
-      alert("✅ Connexion réussie !");
+      alert("✅ SUCCÈS ! Connexion réussie. Redirection...");
       window.location.href = "role-choice.html";
     })
     .catch(error => {
       console.error("❌ ERREUR:", error);
       
-      let message = "❌ Erreur : ";
+      // Réactiver le bouton
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
+      
+      let message = "❌ ERREUR : ";
       switch(error.code) {
         case 'auth/user-not-found':
-          message += "Utilisateur non trouvé";
+          message += "Aucun compte trouvé avec cet email";
           break;
         case 'auth/wrong-password':
-          message += "Mot de passe incorrect";
+          message += "Mot de passe incorrect. Réessaie";
           break;
         case 'auth/invalid-email':
-          message += "Email invalide";
+          message += "Format d'email invalide";
           break;
         default:
           message += error.message;
@@ -90,10 +99,8 @@ function connecter() {
 }
 
 function logout() {
-  console.log("👋 Déconnexion...");
   auth.signOut()
     .then(() => {
-      console.log("✅ Déconnecté");
       window.location.href = "index.html";
     })
     .catch(error => {
@@ -101,19 +108,3 @@ function logout() {
       alert("Erreur lors de la déconnexion");
     });
 }
-
-// Vérifier l'état de la connexion
-auth.onAuthStateChanged(user => {
-  if (user) {
-    console.log("👤 Utilisateur connecté:", user.email);
-    
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    if (!user && (currentPage === "dashboard-client.html" || currentPage === "dashboard-livreur.html" || currentPage === "role-choice.html")) {
-      console.log("🔄 Redirection vers login.html");
-      window.location.href = "login.html";
-    }
-  } else {
-    console.log("👤 Aucun utilisateur connecté");
-  }
-});

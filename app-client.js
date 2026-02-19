@@ -16,7 +16,10 @@ function logout() {
 }
 
 function envoyerCommande() {
-  if (!currentUser) return;
+  if (!currentUser) {
+    alert("❌ Tu dois être connecté pour commander");
+    return;
+  }
 
   // Récupérer toutes les infos
   const commande = {
@@ -40,7 +43,12 @@ function envoyerCommande() {
     return;
   }
 
-  db.collection("commandes").add(commande)
+  // Désactiver le bouton
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+
+  db.collection("commands").add(commande)
     .then(() => {
       alert("✅ Commande envoyée ! Un livreur va l'accepter bientôt.");
       
@@ -54,29 +62,41 @@ function envoyerCommande() {
       document.getElementById("heureLivraison").value = "";
       document.getElementById("instructions").value = "";
       
+      // Réactiver le bouton
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer ma commande';
+      
       chargerMesCommandes();
     })
     .catch(error => {
       console.error("❌ Erreur:", error);
-      alert("Erreur: " + error.message);
+      
+      // Réactiver le bouton
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer ma commande';
+      
+      alert("❌ Erreur: " + error.message);
     });
 }
 
 function chargerMesCommandes() {
   if (!currentUser) return;
 
-  db.collection("commandes")
+  console.log("📦 Chargement des commandes pour:", currentUser.email);
+  
+  db.collection("commands")
     .where("clientId", "==", currentUser.uid)
     .orderBy("timestamp", "desc")
-    .limit(10)
     .onSnapshot(snapshot => {
+      console.log("📊 Commandes trouvées:", snapshot.size);
+      
       const ul = document.getElementById("mesCommandes");
       if (!ul) return;
       
       ul.innerHTML = "";
       
       if (snapshot.empty) {
-        ul.innerHTML = "<li style='text-align: center; color: #666;'>Aucune commande pour le moment</li>";
+        ul.innerHTML = "<li style='text-align: center; color: #666; padding: 20px;'>📭 Aucune commande pour le moment</li>";
         return;
       }
 
@@ -84,39 +104,54 @@ function chargerMesCommandes() {
         const data = doc.data();
         const li = document.createElement("li");
         
-        let statusIcon = {
-          'en_attente': '⏳ En attente',
-          'acceptee': '✅ Acceptée',
-          'livree': '🎉 Livrée'
-        }[data.status] || '⏳';
+        // Déterminer le statut et son style
+        let statusIcon = '⏳';
+        let statusText = 'En attente';
+        let statusColor = '#fff3cd';
+        let statusTextColor = '#856404';
         
-        let statusColor = {
-          'en_attente': '#fff3cd',
-          'acceptee': '#d4edda',
-          'livree': '#d1e7dd'
-        }[data.status] || '#fff3cd';
-        
-        let statusTextColor = {
-          'en_attente': '#856404',
-          'acceptee': '#155724',
-          'livree': '#0f5132'
-        }[data.status] || '#856404';
+        if (data.status === 'acceptee') {
+          statusIcon = '✅';
+          statusText = 'Acceptée';
+          statusColor = '#d4edda';
+          statusTextColor = '#155724';
+        } else if (data.status === 'livree') {
+          statusIcon = '🎉';
+          statusText = 'Livrée';
+          statusColor = '#d1e7dd';
+          statusTextColor = '#0f5132';
+        }
         
         li.innerHTML = `
-          <div style="display: flex; flex-direction: column; width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong>${data.repas}</strong>
-              <span style="font-size: 0.8em; padding: 2px 8px; border-radius: 12px; background: ${statusColor}; color: ${statusTextColor}">
-                ${statusIcon}
+          <div style="display: flex; flex-direction: column; width: 100%; padding: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="font-size: 1.1rem;">🍔 ${data.repas}</strong>
+              <span style="font-size: 0.8em; padding: 4px 10px; border-radius: 20px; background: ${statusColor}; color: ${statusTextColor}; font-weight: bold;">
+                ${statusIcon} ${statusText}
               </span>
             </div>
-            <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+            <div style="font-size: 0.9em; color: #444; margin-bottom: 5px;">
               📍 ${data.salle} (étage ${data.etage}) - ${data.filiere} ${data.niveau}
             </div>
-            ${data.livreurPseudo ? `<div style="font-size: 0.8em; color: #28a745; margin-top: 5px;">🛵 Livré par: ${data.livreurPseudo}</div>` : ''}
+            ${data.livreurPseudo ? `
+              <div style="font-size: 0.85em; color: #28a745; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #ddd;">
+                🛵 Livreur: ${data.livreurPseudo}
+              </div>
+            ` : `
+              <div style="font-size: 0.85em; color: #666; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #ddd;">
+                ⏳ En attente d'un livreur...
+              </div>
+            `}
           </div>
         `;
         ul.appendChild(li);
       });
+    }, error => {
+      console.error("❌ Erreur chargement commandes:", error);
+      
+      const ul = document.getElementById("mesCommandes");
+      if (ul) {
+        ul.innerHTML = "<li style='text-align: center; color: red; padding: 20px;'>❌ Erreur de chargement</li>";
+      }
     });
 }
