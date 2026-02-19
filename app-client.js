@@ -48,7 +48,8 @@ function envoyerCommande() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
 
-  db.collection("commands").add(commande)
+  // ✅ CORRIGÉ: Utiliser "commandes" (avec E)
+  db.collection("commandes").add(commande)
     .then(() => {
       alert("✅ Commande envoyée ! Un livreur va l'accepter bientôt.");
       
@@ -84,7 +85,8 @@ function chargerMesCommandes() {
 
   console.log("📦 Chargement des commandes pour:", currentUser.email);
   
-  db.collection("commands")
+  // ✅ CORRIGÉ: Utiliser "commandes" (avec E) aussi ici
+  db.collection("commandes")
     .where("clientId", "==", currentUser.uid)
     .orderBy("timestamp", "desc")
     .onSnapshot(snapshot => {
